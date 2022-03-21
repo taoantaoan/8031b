@@ -3,6 +3,19 @@ const { User, Conversation, Message } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
+// sorts (conversations) array, in decending order, by createdAt timestamp
+const sortMessagesDesc = (arr) => {
+  arr.sort((a, b) => {
+    const timestampA = new Date(a.messages[0].createdAt); 
+    const timestampB = new Date(b.messages[0].createdAt);
+    if (timestampA > timestampB)
+        return -1;
+    if (timestampA < timestampB)
+        return 1;
+    return 0;
+  });
+};
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -73,6 +86,7 @@ router.get("/", async (req, res, next) => {
       conversations[i] = convoJSON;
     }
 
+    sortMessagesDesc(conversations);
     res.json(conversations);
   } catch (error) {
     next(error);
