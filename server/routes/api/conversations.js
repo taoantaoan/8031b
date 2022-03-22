@@ -6,8 +6,10 @@ const onlineUsers = require("../../onlineUsers");
 // sorts (conversations) array, in decending order, by createdAt timestamp
 const sortMessagesDesc = (arr) => {
   arr.sort((a, b) => {
-    const timestampA = new Date(a.messages[0].createdAt); 
-    const timestampB = new Date(b.messages[0].createdAt);
+    const lastIndexA = a.messages.length - 1;
+    const lastIndexB = b.messages.length - 1;
+    const timestampA = new Date(a.messages[lastIndexA].createdAt); 
+    const timestampB = new Date(b.messages[lastIndexB].createdAt);
     if (timestampA > timestampB)
         return -1;
     if (timestampA < timestampB)
