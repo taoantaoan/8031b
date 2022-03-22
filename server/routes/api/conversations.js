@@ -3,6 +3,21 @@ const { User, Conversation, Message } = require("../../db/models");
 const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
+// sorts (conversations) array, in decending order, by createdAt timestamp
+const sortMessagesDesc = (arr) => {
+  arr.sort((a, b) => {
+    const lastIndexA = a.messages.length - 1;
+    const lastIndexB = b.messages.length - 1;
+    const timestampA = new Date(a.messages[lastIndexA].createdAt); 
+    const timestampB = new Date(b.messages[lastIndexB].createdAt);
+    if (timestampA > timestampB)
+        return -1;
+    if (timestampA < timestampB)
+        return 1;
+    return 0;
+  });
+};
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -19,9 +34,9 @@ router.get("/", async (req, res, next) => {
         },
       },
       attributes: ["id"],
-      order: [[Message, "createdAt", "DESC"]],
+      order: [[Message, "createdAt", "ASC"]],
       include: [
-        { model: Message, order: ["createdAt", "DESC"] },
+        { model: Message, order: ["createdAt", "ASC"] },
         {
           model: User,
           as: "user1",
@@ -68,10 +83,12 @@ router.get("/", async (req, res, next) => {
       }
 
       // set properties for notification count and latest message preview
-      convoJSON.latestMessageText = convoJSON.messages[0].text;
+      const lastMessageIndex = convoJSON.messages.length - 1;
+      convoJSON.latestMessageText = convoJSON.messages[lastMessageIndex].text;
       conversations[i] = convoJSON;
     }
 
+    sortMessagesDesc(conversations);
     res.json(conversations);
   } catch (error) {
     next(error);
