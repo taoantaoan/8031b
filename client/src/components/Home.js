@@ -78,6 +78,16 @@ const Home = ({ user, logout }) => {
     }
   };
 
+  const updateReadReceipts = async (body) => {
+    try {
+      const { data } = await axios.patch('/api/messages/read', body);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+    return;
+  };
+
   const addNewConvo = useCallback((recipientId, message) => {
     setConversations((prev) =>
       prev.map((convo) => {
@@ -218,6 +228,7 @@ const Home = ({ user, logout }) => {
           conversations={conversations}
           user={user}
           postMessage={postMessage}
+          updateReadReceipts={updateReadReceipts}
         />
       </Grid>
     </>

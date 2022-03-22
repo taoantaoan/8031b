@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
@@ -42,5 +43,37 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
+
+// update a message readStatus to `true`
+router.patch("/read", async (req, res, next) => {
+  try { 
+    if (!req.user) return res.sendStatus(401);
+
+    const {conversationId, senderId} = req.body; // user or conversation id
+
+    if (!conversationId) {
+      return res
+        .status(400)
+        .json({ error: "A conversationId is required to update readStatus of existing messages." });
+    }
+    
+    // returns the number of items changed and the updated rows
+    const [_itemsChanged, updatedRows] = await Message.update(
+      { readStatus: true }, 
+      {
+        where: { 
+          conversationId: conversationId,
+          readStatus: false,
+          [Op.not]: [{ senderId: senderId }]
+        },
+        returning: true,
+      }
+    );
+    res.json({ updatedMessages: updatedRows });
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = router;
