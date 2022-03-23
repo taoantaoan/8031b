@@ -18,6 +18,22 @@ const sortMessagesDesc = (arr) => {
   });
 };
 
+// finds id of lastReadMessage  by userId or returns 0
+const findLastReadMessageId = (messages = [], userId) => {
+  if (messages.length === 0) return -1;
+  let currentMessage = messages[messages.length - 1];
+  for (let i = messages.length - 1; i >= 0; i--) {
+    // if message is already read, break loop early
+    if (currentMessage.readStatus) break;
+    if (currentMessage.senderId !== userId) {
+      currentMessage = messages[i];
+      continue;
+    }
+    currentMessage = messages[i];
+  }
+  return currentMessage?.id || 0;
+};
+
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -82,20 +98,25 @@ router.get("/", async (req, res, next) => {
         convoJSON.otherUser.online = false;
       }
 
+      // destructure otherUser and messages
+      const {messages, otherUser } = convoJSON;
+
       // set properties for notification count and latest message preview
-      const lastMessageIndex = convoJSON.messages.length - 1;
-      convoJSON.latestMessageText = convoJSON.messages[lastMessageIndex].text;
+      const lastMessageIndex = messages.length - 1;
+      convoJSON.latestMessageText = messages[lastMessageIndex].text;
       convoJSON.unreadMessages = await Message.count({
         where: {
           conversationId: convoJSON.id,
-          senderId: convoJSON.otherUser.id,
+          senderId: otherUser.id,
           readStatus: false
         }
       })
+      convoJSON.lastReadMessageId = findLastReadMessageId(messages, userId)
       conversations[i] = convoJSON;
     }
 
     sortMessagesDesc(conversations);
+    console.log('----------conversations: ', conversations);
     res.json(conversations);
   } catch (error) {
     next(error);
