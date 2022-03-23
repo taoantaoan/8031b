@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Chat = ({ conversation, setActiveChat }) => {
   const classes = useStyles();
-  const { otherUser } = conversation;
+  const { otherUser, unreadMessages = 0 } = conversation;
 
   const handleClick = async (conversation) => {
     await setActiveChat(conversation.otherUser.username);
@@ -34,7 +34,7 @@ const Chat = ({ conversation, setActiveChat }) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
-      <UnreadMessages count={conversation.unreadMessages} />
+      {!!unreadMessages && <UnreadMessages count={unreadMessages} />}
     </Box>
   );
 };
