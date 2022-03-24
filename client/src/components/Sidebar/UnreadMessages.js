@@ -16,7 +16,6 @@ const useStyles = makeStyles((theme) => ({
 
 const UnreadMessages = ({ count }) => {
   const classes = useStyles();
-  console.log(`count: `, count);
   return <div className={classes.root}>{count}</div>;
 };
 

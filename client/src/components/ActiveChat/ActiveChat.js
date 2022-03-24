@@ -45,6 +45,9 @@ const ActiveChat = ({
 
   useEffect(() => {
     if (conversation?.id) {
+      // check if there are any messages and that some are unread
+      if (conversation.messages.length === 0) return;
+      if (conversation.unreadMessages?.length === 0) return;
       const conversationId = conversation.id;
       const senderId = user.id;
       const reqBody = {

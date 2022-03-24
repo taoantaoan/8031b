@@ -116,7 +116,6 @@ router.get("/", async (req, res, next) => {
     }
 
     sortMessagesDesc(conversations);
-    console.log('----------conversations: ', conversations);
     res.json(conversations);
   } catch (error) {
     next(error);
