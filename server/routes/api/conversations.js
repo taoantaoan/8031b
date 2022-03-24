@@ -20,16 +20,18 @@ const sortMessagesDesc = (arr) => {
 
 // finds id of lastReadMessage  by userId or returns 0
 const findLastReadMessageId = (messages = [], userId) => {
-  if (messages.length === 0) return -1;
-  let currentMessage = messages[messages.length - 1];
-  for (let i = messages.length - 1; i >= 0; i--) {
-    // if message is already read, break loop early
-    if (currentMessage.readStatus) break;
+  if (!messages?.length) return -1;
+  let messagesIndex = messages.length - 1;
+  let currentMessage = messages[messagesIndex];
+  while (messagesIndex >= 0) {
     if (currentMessage.senderId !== userId) {
-      currentMessage = messages[i];
+      messagesIndex--;
+      currentMessage = messages[messagesIndex];
       continue;
-    }
-    currentMessage = messages[i];
+    };
+    if (currentMessage.readStatus === true) break;
+    messagesIndex--;
+    currentMessage = messages[messagesIndex];
   }
   return currentMessage?.id || 0;
 };
