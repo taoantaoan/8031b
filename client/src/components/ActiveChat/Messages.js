@@ -16,7 +16,7 @@ const Messages = (props) => {
   const { messages, otherUser, userId, lastReadMessageId } = props;
   const classes = useStyles();
 
-  let lastReadAvatar = (
+  const lastReadAvatar = (
     <Avatar
       alt={otherUser.username}
       src={otherUser.photoUrl}
