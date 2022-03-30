@@ -37,7 +37,7 @@ Conversation.isConversationParticipant = async function (userId, conversationId)
       },
     });
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 
   return !!conversation;
