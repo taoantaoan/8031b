@@ -53,9 +53,12 @@ router.patch("/read", async (req, res, next) => {
 
     if (!conversationId) {
       return res
-        .status(400)
-        .json({ error: "A conversationId is required to update readStatus of existing messages." });
+      .status(400)
+      .json({ error: "A conversationId is required to update readStatus of existing messages." });
     }
+
+    // check if user is authorized
+    if (!(await Conversation.isConversationParticipant(senderId, conversationId))) return res.sendStatus(403);
     
     // returns the number of items changed and the updated rows
     const [_itemsChanged, updatedRows] = await Message.update(
