@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
 const UnreadMessages = ({ count }) => {
   const classes = useStyles();
   return (
-    <Badge badgeContent={count} classes={{ badge: classes.badge }}></Badge>
+    <Badge badgeContent={count} classes={{ badge: classes.badge }}/>
   );
 };
 
