@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import { Input, Header, Messages } from './index';
@@ -24,18 +24,39 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
+  updateReadReceipts,
 }) => {
   const classes = useStyles();
 
-  const conversation = conversations
-    ? conversations.find(
-        (conversation) => conversation.otherUser.username === activeConversation
-      )
-    : {};
+  const conversation = useMemo(
+    () =>
+      conversations
+        ? conversations.find(
+            (conversation) =>
+              conversation.otherUser.username === activeConversation
+          )
+        : {},
+    [conversations, activeConversation]
+  );
 
   const isConversation = (obj) => {
     return obj !== {} && obj !== undefined;
   };
+
+  useEffect(() => {
+    if (conversation?.id) {
+      // check if there are any messages and that some are unread
+      if (conversation.messages.length === 0) return;
+      if (conversation.unreadMessages?.length === 0) return;
+      const conversationId = conversation.id;
+      const senderId = user.id;
+      const reqBody = {
+        conversationId,
+        senderId,
+      };
+      updateReadReceipts(reqBody);
+    }
+  }, [conversation, updateReadReceipts, user]);
 
   return (
     <Box className={classes.root}>
@@ -52,6 +73,7 @@ const ActiveChat = ({
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  lastReadMessageId={conversation.lastReadMessageId}
                 />
                 <Input
                   otherUser={conversation.otherUser}

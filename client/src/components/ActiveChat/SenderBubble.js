@@ -27,7 +27,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const SenderBubble = ({ time, text }) => {
+const SenderBubble = ({ time, text, lastReadAvatarProps = null }) => {
   const classes = useStyles();
 
   return (
@@ -36,6 +36,7 @@ const SenderBubble = ({ time, text }) => {
       <Box className={classes.bubble}>
         <Typography className={classes.text}>{text}</Typography>
       </Box>
+      {lastReadAvatarProps}
     </Box>
   );
 };
