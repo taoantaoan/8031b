@@ -18,24 +18,6 @@ const sortMessagesDesc = (arr) => {
   });
 };
 
-// finds id of lastReadMessage  by userId or returns 0
-const findLastReadMessageId = (messages = [], userId) => {
-  if (!messages?.length) return -1;
-  let messagesIndex = messages.length - 1;
-  let currentMessage = messages[messagesIndex];
-  while (messagesIndex >= 0) {
-    if (currentMessage.senderId !== userId) {
-      messagesIndex--;
-      currentMessage = messages[messagesIndex];
-      continue;
-    };
-    if (currentMessage.readStatus === true) break;
-    messagesIndex--;
-    currentMessage = messages[messagesIndex];
-  }
-  return currentMessage?.id || 0;
-};
-
 // get all conversations for a user, include latest message text for preview, and all messages
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
@@ -113,7 +95,16 @@ router.get("/", async (req, res, next) => {
           readStatus: false
         }
       })
-      convoJSON.lastReadMessageId = findLastReadMessageId(messages, userId)
+      const lastReadMessage = await Message.findOne({
+        where: {
+          conversationId: convoJSON.id,
+          senderId: userId,
+          readStatus: true,
+        },
+        order: [ [ 'createdAt', 'DESC' ]],
+      });
+      
+      convoJSON.lastReadMessageId = lastReadMessage?.id || 0;
       conversations[i] = convoJSON;
     }
 
